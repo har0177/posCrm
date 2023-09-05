@@ -11,7 +11,7 @@ class Role extends Model
   use HasFactory;
   
   protected $fillable = [
-    'name', 'slug', 'description', 'permissions'
+    'name', 'permissions'
   ];
   
   protected $casts = [
