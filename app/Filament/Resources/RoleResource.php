@@ -25,7 +25,9 @@ class RoleResource extends Resource
   {
     return $form
       ->schema( [
-        Section::make()
+        Section::make('Role')
+               ->description('Create / Update Role.')
+               ->icon('heroicon-m-cog')
                ->schema( [
                  Grid::make()
                      ->schema( [

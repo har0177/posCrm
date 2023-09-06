@@ -26,7 +26,9 @@ class UserResource extends Resource
   {
     return $form
       ->schema( [
-        Section::make()
+        Section::make('User')
+          ->description('Create / Update User.')
+          ->icon('heroicon-m-user')
                ->schema( [
                  Grid::make()
                      ->schema( [
@@ -96,7 +98,7 @@ class UserResource extends Resource
   public static function getRelations() : array
   {
     return [
-
+    
     ];
   }
   
