@@ -18,6 +18,8 @@ Route::get('/', function () {
 });
 
 Route::get('/test', function () {
+  
+  dd(extension_loaded('sqlite3'), extension_loaded('pdo_sqlite'));
   // Retrieve and format your permissions as needed
   $permissions = config( 'permissions' );
   
