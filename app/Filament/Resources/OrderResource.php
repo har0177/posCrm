@@ -334,6 +334,8 @@ class OrderResource extends Resource
       
       Forms\Components\MarkdownEditor::make( 'notes' )
                                      ->columnSpan( 'full' ),
+
     ];
   }
+  
 }
