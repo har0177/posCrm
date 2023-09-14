@@ -3,16 +3,31 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Filament\Resources\OrderResource\RelationManagers\PaymentsRelationManager;
 use App\Filament\Resources\OrderResource\Widgets\OrderStats;
 use App\Forms\Components\AddressForm;
 use App\Models\Order;
 use App\Models\Product;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\Summarizers\Sum;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +39,7 @@ class OrderResource extends Resource
 {
   protected static ?string $model = Order::class;
   
-  //protected static ?string $slug = 'shop/orders';
+  // protected static ?string $slug = 'shop/orders';
   
   protected static ?string $recordTitleAttribute = 'number';
   
@@ -38,31 +53,31 @@ class OrderResource extends Resource
   {
     return $form
       ->schema( [
-        Forms\Components\Group::make()
-                              ->schema( [
-                                Forms\Components\Section::make()
-                                                        ->schema( static::getFormSchema() )
-                                                        ->columns( 2 ),
+        Group::make()
+             ->schema( [
+               Section::make()
+                      ->schema( static::getFormSchema() )
+                      ->columns( 2 ),
           
-                                Forms\Components\Section::make( 'Order items' )
-                                                        ->schema( static::getFormSchema( 'items' ) ),
-                              ] )
-                              ->columnSpan( [ 'lg' => fn( ?Order $record ) => $record === null ? 3 : 2 ] ),
+               Section::make( 'Order items' )
+                      ->schema( static::getFormSchema( 'items' ) ),
+             ] )
+             ->columnSpan( [ 'lg' => fn( ?Order $record ) => $record === null ? 3 : 2 ] ),
         
-        Forms\Components\Section::make()
-                                ->schema( [
-                                  Forms\Components\Placeholder::make( 'created_at' )
-                                                              ->label( 'Created at' )
-                                                              ->content( fn( Order $record
-                                                              ) : ?string => $record->created_at?->diffForHumans() ),
+        Section::make()
+               ->schema( [
+                 Placeholder::make( 'created_at' )
+                            ->label( 'Created at' )
+                            ->content( fn( Order $record
+                            ) : ?string => $record->created_at?->diffForHumans() ),
           
-                                  Forms\Components\Placeholder::make( 'updated_at' )
-                                                              ->label( 'Last modified at' )
-                                                              ->content( fn( Order $record
-                                                              ) : ?string => $record->updated_at?->diffForHumans() ),
-                                ] )
-                                ->columnSpan( [ 'lg' => 1 ] )
-                                ->hidden( fn( ?Order $record ) => $record === null ),
+                 Placeholder::make( 'updated_at' )
+                            ->label( 'Last modified at' )
+                            ->content( fn( Order $record
+                            ) : ?string => $record->updated_at?->diffForHumans() ),
+               ] )
+               ->columnSpan( [ 'lg' => 1 ] )
+               ->hidden( fn( ?Order $record ) => $record === null ),
       ] )
       ->columns( 3 );
   }
@@ -71,94 +86,94 @@ class OrderResource extends Resource
   {
     return $table
       ->columns( [
-        Tables\Columns\TextColumn::make( 'number' )
-                                 ->searchable()
-                                 ->sortable(),
-        Tables\Columns\TextColumn::make( 'customer.name' )
-                                 ->searchable()
-                                 ->sortable()
-                                 ->toggleable(),
-        Tables\Columns\BadgeColumn::make( 'status' )
-                                  ->colors( [
-                                    'danger'  => 'cancelled',
-                                    'warning' => 'processing',
-                                    'success' => fn( $state ) => in_array( $state, [ 'delivered', 'shipped' ] ),
-                                  ] ),
-        Tables\Columns\TextColumn::make( 'currency' )
-                                 ->getStateUsing( fn( $record
-                                 ) : ?string => Currency::find( $record->currency )?->name ?? null )
-                                 ->searchable()
-                                 ->sortable()
-                                 ->toggleable(),
-        Tables\Columns\TextColumn::make( 'total_price' )
-                                 ->searchable()
-                                 ->sortable()
-                                 ->summarize( [
-                                   Tables\Columns\Summarizers\Sum::make()
-                                                                 ->money(),
-                                 ] ),
-        Tables\Columns\TextColumn::make( 'shipping_price' )
-                                 ->label( 'Shipping cost' )
-                                 ->searchable()
-                                 ->sortable()
-                                 ->toggleable()
-                                 ->summarize( [
-                                   Tables\Columns\Summarizers\Sum::make()
-                                                                 ->money(),
-                                 ] ),
-        Tables\Columns\TextColumn::make( 'created_at' )
-                                 ->label( 'Order Date' )
-                                 ->date()
-                                 ->toggleable(),
+        TextColumn::make( 'number' )
+                  ->searchable()
+                  ->sortable(),
+        TextColumn::make( 'customer.name' )
+                  ->searchable()
+                  ->sortable()
+                  ->toggleable(),
+        BadgeColumn::make( 'status' )
+                   ->colors( [
+                     'danger'  => 'cancelled',
+                     'warning' => 'processing',
+                     'success' => fn( $state ) => in_array( $state, [ 'delivered', 'shipped' ] ),
+                   ] ),
+        TextColumn::make( 'currency' )
+                  ->getStateUsing( fn( $record
+                  ) : ?string => Currency::find( $record->currency )?->name ?? null )
+                  ->searchable()
+                  ->sortable()
+                  ->toggleable(),
+        TextColumn::make( 'total_price' )
+                  ->searchable()
+                  ->sortable()
+                  ->summarize( [
+                    Sum::make()
+                       ->money(),
+                  ] ),
+        TextColumn::make( 'shipping_price' )
+                  ->label( 'Shipping cost' )
+                  ->searchable()
+                  ->sortable()
+                  ->toggleable()
+                  ->summarize( [
+                    Sum::make()
+                       ->money(),
+                  ] ),
+        TextColumn::make( 'created_at' )
+                  ->label( 'Order Date' )
+                  ->date()
+                  ->toggleable(),
       ] )
       ->filters( [
-        Tables\Filters\TrashedFilter::make(),
+        TrashedFilter::make(),
         
-        Tables\Filters\Filter::make( 'created_at' )
-                             ->form( [
-                               Forms\Components\DatePicker::make( 'created_from' )
-                                                          ->placeholder( fn( $state
-                                                          ) : string => 'Dec 18, ' . now()->subYear()->format( 'Y' ) ),
-                               Forms\Components\DatePicker::make( 'created_until' )
-                                                          ->placeholder( fn( $state
-                                                          ) : string => now()->format( 'M d, Y' ) ),
-                             ] )
-                             ->query( function( Builder $query, array $data ) : Builder {
-                               return $query
-                                 ->when(
-                                   $data[ 'created_from' ] ?? null,
-                                   fn( Builder $query, $date ) : Builder => $query->whereDate( 'created_at', '>=',
-                                     $date ),
-                                 )
-                                 ->when(
-                                   $data[ 'created_until' ] ?? null,
-                                   fn( Builder $query, $date ) : Builder => $query->whereDate( 'created_at', '<=',
-                                     $date ),
-                                 );
-                             } )
-                             ->indicateUsing( function( array $data ) : array {
-                               $indicators = [];
-                               if( $data[ 'created_from' ] ?? null ) {
-                                 $indicators[ 'created_from' ] = 'Order from ' . Carbon::parse( $data[ 'created_from' ] )->toFormattedDateString();
-                               }
-                               if( $data[ 'created_until' ] ?? null ) {
-                                 $indicators[ 'created_until' ] = 'Order until ' . Carbon::parse( $data[ 'created_until' ] )->toFormattedDateString();
-                               }
+        Filter::make( 'created_at' )
+              ->form( [
+                DatePicker::make( 'created_from' )
+                          ->placeholder( fn( $state
+                          ) : string => 'Dec 18, ' . now()->subYear()->format( 'Y' ) ),
+                DatePicker::make( 'created_until' )
+                          ->placeholder( fn( $state
+                          ) : string => now()->format( 'M d, Y' ) ),
+              ] )
+              ->query( function( Builder $query, array $data ) : Builder {
+                return $query
+                  ->when(
+                    $data[ 'created_from' ] ?? null,
+                    fn( Builder $query, $date ) : Builder => $query->whereDate( 'created_at', '>=',
+                      $date ),
+                  )
+                  ->when(
+                    $data[ 'created_until' ] ?? null,
+                    fn( Builder $query, $date ) : Builder => $query->whereDate( 'created_at', '<=',
+                      $date ),
+                  );
+              } )
+              ->indicateUsing( function( array $data ) : array {
+                $indicators = [];
+                if( $data[ 'created_from' ] ?? null ) {
+                  $indicators[ 'created_from' ] = 'Order from ' . Carbon::parse( $data[ 'created_from' ] )->toFormattedDateString();
+                }
+                if( $data[ 'created_until' ] ?? null ) {
+                  $indicators[ 'created_until' ] = 'Order until ' . Carbon::parse( $data[ 'created_until' ] )->toFormattedDateString();
+                }
           
-                               return $indicators;
-                             } ),
+                return $indicators;
+              } ),
       ] )
       ->actions( [
-        Tables\Actions\EditAction::make(),
+        EditAction::make(),
       ] )
       ->groupedBulkActions( [
-        Tables\Actions\DeleteBulkAction::make()
-                                       ->action( function() {
-                                         Notification::make()
-                                                     ->title( 'Now, now, don\'t be cheeky, leave some records for others to play with!' )
-                                                     ->warning()
-                                                     ->send();
-                                       } ),
+        DeleteBulkAction::make()
+                        ->action( function() {
+                          Notification::make()
+                                      ->title( 'Now, now, don\'t be cheeky, leave some records for others to play with!' )
+                                      ->warning()
+                                      ->send();
+                        } ),
       ] )
       ->groups( [
         Tables\Grouping\Group::make( 'created_at' )
@@ -171,7 +186,7 @@ class OrderResource extends Resource
   public static function getRelations() : array
   {
     return [
-      RelationManagers\PaymentsRelationManager::class,
+      PaymentsRelationManager::class,
     ];
   }
   
@@ -224,118 +239,116 @@ class OrderResource extends Resource
   {
     if( $section === 'items' ) {
       return [
-        Forms\Components\Repeater::make( 'items' )
-                                 ->relationship()
-                                 ->schema( [
-                                   Forms\Components\Select::make( 'product_id' )
-                                                          ->label( 'Product' )
-                                                          ->options( Product::query()->pluck( 'name', 'id' ) )
-                                                          ->required()
-                                                          ->reactive()
-                                                          ->afterStateUpdated( fn(
-                                                            $state,
-                                                            Forms\Set $set
-                                                          ) => $set( 'unit_price',
-                                                            Product::find( $state )?->price ?? 0 ) )
-                                                          ->columnSpan( [
-                                                            'md' => 5,
-                                                          ] )
-                                                          ->searchable(),
+        Repeater::make( 'items' )
+                ->relationship()
+                ->schema( [
+                  Select::make( 'product_id' )
+                        ->label( 'Product' )
+                        ->options( Product::query()->pluck( 'name', 'id' ) )
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated( fn(
+                          $state,
+                          Forms\Set $set
+                        ) => $set( 'unit_price',
+                          Product::find( $state )?->price ?? 0 ) )
+                        ->columnSpan( [
+                          'md' => 5,
+                        ] )
+                        ->searchable(),
           
-                                   Forms\Components\TextInput::make( 'qty' )
-                                                             ->label( 'Quantity' )
-                                                             ->numeric()
-                                                             ->default( 1 )
-                                                             ->columnSpan( [
-                                                               'md' => 2,
-                                                             ] )
-                                                             ->required(),
+                  TextInput::make( 'qty' )
+                           ->label( 'Quantity' )
+                           ->numeric()
+                           ->default( 1 )
+                           ->columnSpan( [
+                             'md' => 2,
+                           ] )
+                           ->required(),
           
-                                   Forms\Components\TextInput::make( 'unit_price' )
-                                                             ->label( 'Unit Price' )
-                                                             ->disabled()
-                                                             ->dehydrated()
-                                                             ->numeric()
-                                                             ->required()
-                                                             ->columnSpan( [
-                                                               'md' => 3,
-                                                             ] ),
-                                 ] )
-                                 ->orderable()
-                                 ->defaultItems( 1 )
-                                 ->disableLabel()
-                                 ->columns( [
-                                   'md' => 10,
-                                 ] )
-                                 ->required(),
+                  TextInput::make( 'unit_price' )
+                           ->label( 'Unit Price' )
+                           ->disabled()
+                           ->dehydrated()
+                           ->numeric()
+                           ->required()
+                           ->columnSpan( [
+                             'md' => 3,
+                           ] ),
+                ] )
+                ->orderable()
+                ->defaultItems( 1 )
+                ->disableLabel()
+                ->columns( [
+                  'md' => 10,
+                ] )
+                ->required(),
       ];
     }
     
     return [
-      Forms\Components\TextInput::make( 'number' )
-                                ->default( 'OR-' . random_int( 100000, 999999 ) )
-                                ->disabled()
-                                ->dehydrated()
-                                ->required(),
+      TextInput::make( 'number' )
+               ->default( 'OR-' . random_int( 100000, 999999 ) )
+               ->disabled()
+               ->dehydrated()
+               ->required(),
       
-      Forms\Components\Select::make( 'customer_id' )
-                             ->relationship( 'customer', 'name' )
-                             ->searchable()
-                             ->required()
-                             ->createOptionForm( [
-                               Forms\Components\TextInput::make( 'name' )
-                                                         ->required(),
+      Select::make( 'customer_id' )
+            ->relationship( 'customer', 'name' )
+            ->searchable()
+            ->required()
+            ->createOptionForm( [
+              TextInput::make( 'name' )
+                       ->required(),
         
-                               Forms\Components\TextInput::make( 'email' )
-                                                         ->label( 'Email address' )
-                                                         ->required()
-                                                         ->email()
-                                                         ->unique(),
+              TextInput::make( 'email' )
+                       ->label( 'Email address' )
+                       ->required()
+                       ->email()
+                       ->unique(),
         
-                               Forms\Components\TextInput::make( 'phone' ),
+              TextInput::make( 'phone' ),
         
-                               Forms\Components\Select::make( 'gender' )
-                                                      ->placeholder( 'Select gender' )
-                                                      ->options( [
-                                                        'male'   => 'Male',
-                                                        'female' => 'Female',
-                                                      ] )
-                                                      ->required()
-                                                      ->native( false ),
-                             ] )
-                             ->createOptionAction( function( Forms\Components\Actions\Action $action ) {
-                               return $action
-                                 ->modalHeading( 'Create customer' )
-                                 ->modalButton( 'Create customer' )
-                                 ->modalWidth( 'lg' );
-                             } ),
+              Select::make( 'gender' )
+                    ->placeholder( 'Select gender' )
+                    ->options( [
+                      'male'   => 'Male',
+                      'female' => 'Female',
+                    ] )
+                    ->required()
+                    ->native( false ),
+            ] )
+            ->createOptionAction( function( Forms\Components\Actions\Action $action ) {
+              return $action
+                ->modalHeading( 'Create customer' )
+                ->modalButton( 'Create customer' )
+                ->modalWidth( 'lg' );
+            } ),
       
-      Forms\Components\Select::make( 'status' )
-                             ->options( [
-                               'new'        => 'New',
-                               'processing' => 'Processing',
-                               'shipped'    => 'Shipped',
-                               'delivered'  => 'Delivered',
-                               'cancelled'  => 'Cancelled',
-                             ] )
-                             ->required()
-                             ->native( false ),
+      Select::make( 'status' )
+            ->options( [
+              'new'        => 'New',
+              'processing' => 'Processing',
+              'shipped'    => 'Shipped',
+              'delivered'  => 'Delivered',
+              'cancelled'  => 'Cancelled',
+            ] )
+            ->required()
+            ->native( false ),
       
-      Forms\Components\Select::make( 'currency' )
-                             ->searchable()
-                             ->getSearchResultsUsing( fn( string $query ) => Currency::where( 'name', 'like',
-                               "%{$query}%" )->pluck( 'name', 'id' ) )
-                             ->getOptionLabelUsing( fn( $value
-                             ) : ?string => Currency::find( $value )?->getAttribute( 'name' ) )
-                             ->required(),
+      Select::make( 'currency' )
+            ->searchable()
+            ->getSearchResultsUsing( fn( string $query ) => Currency::where( 'name', 'like',
+              "%{$query}%" )->pluck( 'name', 'id' ) )
+            ->getOptionLabelUsing( fn( $value
+            ) : ?string => Currency::find( $value )?->getAttribute( 'name' ) )
+            ->required(),
       
       AddressForm::make( 'address' )
                  ->columnSpan( 'full' ),
       
-      Forms\Components\MarkdownEditor::make( 'notes' )
-                                     ->columnSpan( 'full' ),
-
+      MarkdownEditor::make( 'notes' )
+                    ->columnSpan( 'full' ),
     ];
   }
-  
 }

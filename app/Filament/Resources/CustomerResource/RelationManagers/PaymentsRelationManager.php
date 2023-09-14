@@ -8,7 +8,11 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -74,38 +78,38 @@ class PaymentsRelationManager extends RelationManager
   {
     return $table
       ->columns( [
-        Tables\Columns\TextColumn::make( 'order.number' )
-                                 ->url( fn( $record ) => OrderResource::getUrl( 'edit', [ $record->order ] ) )
-                                 ->searchable()
-                                 ->sortable(),
+        TextColumn::make( 'order.number' )
+                  ->url( fn( $record ) => OrderResource::getUrl( 'edit', [ $record->order ] ) )
+                  ->searchable()
+                  ->sortable(),
         
-        Tables\Columns\TextColumn::make( 'reference' )
-                                 ->searchable(),
+        TextColumn::make( 'reference' )
+                  ->searchable(),
         
-        Tables\Columns\TextColumn::make( 'amount' )
-                                 ->sortable()
-                                 ->money( fn( $record ) => $record->currency ),
+        TextColumn::make( 'amount' )
+                  ->sortable()
+                  ->money( fn( $record ) => $record->currency ),
         
-        Tables\Columns\TextColumn::make( 'provider' )
-                                 ->formatStateUsing( fn( $state ) => Str::headline( $state ) )
-                                 ->sortable(),
+        TextColumn::make( 'provider' )
+                  ->formatStateUsing( fn( $state ) => Str::headline( $state ) )
+                  ->sortable(),
         
-        Tables\Columns\TextColumn::make( 'method' )
-                                 ->formatStateUsing( fn( $state ) => Str::headline( $state ) )
-                                 ->sortable(),
+        TextColumn::make( 'method' )
+                  ->formatStateUsing( fn( $state ) => Str::headline( $state ) )
+                  ->sortable(),
       ] )
       ->filters( [
         //
       ] )
       ->headerActions( [
-        Tables\Actions\CreateAction::make(),
+        CreateAction::make(),
       ] )
       ->actions( [
-        Tables\Actions\EditAction::make(),
-        Tables\Actions\DeleteAction::make(),
+        EditAction::make(),
+        DeleteAction::make(),
       ] )
       ->groupedBulkActions( [
-        Tables\Actions\DeleteBulkAction::make(),
+        DeleteBulkAction::make(),
       ] );
   }
 }

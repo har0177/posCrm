@@ -2,14 +2,23 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
-use Filament\Forms;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class CommentsRelationManager extends RelationManager
@@ -23,21 +32,21 @@ class CommentsRelationManager extends RelationManager
     return $form
       ->columns( 1 )
       ->schema( [
-        Forms\Components\TextInput::make( 'title' )
-                                  ->required(),
+        TextInput::make( 'title' )
+                 ->required(),
         
-        Forms\Components\Select::make( 'customer_id' )
-                               ->relationship( 'customer', 'name' )
-                               ->searchable()
-                               ->required(),
+        Select::make( 'customer_id' )
+              ->relationship( 'customer', 'name' )
+              ->searchable()
+              ->required(),
         
-        Forms\Components\Toggle::make( 'is_visible' )
-                               ->label( 'Approved for public' )
-                               ->default( true ),
+        Toggle::make( 'is_visible' )
+              ->label( 'Approved for public' )
+              ->default( true ),
         
-        Forms\Components\MarkdownEditor::make( 'content' )
-                                       ->required()
-                                       ->label( 'Content' ),
+        MarkdownEditor::make( 'content' )
+                      ->required()
+                      ->label( 'Content' ),
       ] );
   }
   
@@ -60,41 +69,41 @@ class CommentsRelationManager extends RelationManager
   {
     return $table
       ->columns( [
-        Tables\Columns\TextColumn::make( 'title' )
-                                 ->label( 'Title' )
-                                 ->searchable()
-                                 ->sortable(),
+        TextColumn::make( 'title' )
+                  ->label( 'Title' )
+                  ->searchable()
+                  ->sortable(),
         
-        Tables\Columns\TextColumn::make( 'customer.name' )
-                                 ->label( 'Customer' )
-                                 ->searchable()
-                                 ->sortable(),
+        TextColumn::make( 'customer.name' )
+                  ->label( 'Customer' )
+                  ->searchable()
+                  ->sortable(),
         
-        Tables\Columns\IconColumn::make( 'is_visible' )
-                                 ->label( 'Visibility' )
-                                 ->boolean()
-                                 ->sortable(),
+        IconColumn::make( 'is_visible' )
+                  ->label( 'Visibility' )
+                  ->boolean()
+                  ->sortable(),
       ] )
       ->filters( [
         //
       ] )
       ->headerActions( [
-        Tables\Actions\CreateAction::make()
-                                   ->after( function( $record ) {
-                                     Notification::make()
-                                                 ->title( 'New comment' )
-                                                 ->icon( 'heroicon-o-chat-bubble-bottom-center-text' )
-                                                 ->body( "**{$record->customer->name} commented on product ({$record->commentable->name}).**" )
-                                                 ->sendToDatabase( auth()->user() );
-                                   } ),
+        CreateAction::make()
+                    ->after( function( $record ) {
+                      Notification::make()
+                                  ->title( 'New comment' )
+                                  ->icon( 'heroicon-o-chat-bubble-bottom-center-text' )
+                                  ->body( "**{$record->customer->name} commented on product ({$record->commentable->name}).**" )
+                                  ->sendToDatabase( auth()->user() );
+                    } ),
       ] )
       ->actions( [
-        Tables\Actions\ViewAction::make(),
-        Tables\Actions\EditAction::make(),
-        Tables\Actions\DeleteAction::make(),
+        ViewAction::make(),
+        EditAction::make(),
+        DeleteAction::make(),
       ] )
       ->groupedBulkActions( [
-        Tables\Actions\DeleteBulkAction::make(),
+        DeleteBulkAction::make(),
       ] );
   }
 }

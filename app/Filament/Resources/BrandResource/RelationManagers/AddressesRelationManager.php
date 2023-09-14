@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
-use Filament\Forms\Components\Select;
+use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -28,15 +28,19 @@ class AddressesRelationManager extends RelationManager
     return $form
       ->schema( [
         TextInput::make( 'street' ),
+        
         TextInput::make( 'zip' ),
+        
         TextInput::make( 'city' ),
+        
         TextInput::make( 'state' ),
-        Select::make( 'country' )
-              ->searchable()
-              ->getSearchResultsUsing( fn( string $query ) => Country::where( 'name', 'like',
-                "%{$query}%" )->pluck( 'name', 'id' ) )
-              ->getOptionLabelUsing( fn( $value
-              ) : ?string => Country::find( $value )?->getAttribute( 'name' ) ),
+        
+        Forms\Components\Select::make( 'country' )
+                               ->searchable()
+                               ->getSearchResultsUsing( fn( string $query ) => Country::where( 'name', 'like',
+                                 "%{$query}%" )->pluck( 'name', 'id' ) )
+                               ->getOptionLabelUsing( fn( $value
+                               ) : ?string => Country::find( $value )?->getAttribute( 'name' ) ),
       ] );
   }
   
@@ -45,8 +49,11 @@ class AddressesRelationManager extends RelationManager
     return $table
       ->columns( [
         TextColumn::make( 'street' ),
+        
         TextColumn::make( 'zip' ),
+        
         TextColumn::make( 'city' ),
+        
         TextColumn::make( 'country' )
                   ->formatStateUsing( fn( $state ) : ?string => Country::find( $state )?->name ?? null ),
       ] )

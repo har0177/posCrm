@@ -4,7 +4,9 @@ namespace App\Filament\Widgets;
 
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
-use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Squire\Models\Currency;
@@ -22,39 +24,39 @@ class LatestOrders extends BaseWidget
       ->defaultPaginationPageOption( 5 )
       ->defaultSort( 'created_at', 'desc' )
       ->columns( [
-        Tables\Columns\TextColumn::make( 'created_at' )
-                                 ->label( 'Order Date' )
-                                 ->date()
-                                 ->sortable(),
-        Tables\Columns\TextColumn::make( 'number' )
-                                 ->searchable()
-                                 ->sortable(),
-        Tables\Columns\TextColumn::make( 'customer.name' )
-                                 ->searchable()
-                                 ->sortable(),
-        Tables\Columns\BadgeColumn::make( 'status' )
-                                  ->colors( [
-                                    'danger'  => 'cancelled',
-                                    'warning' => 'processing',
-                                    'success' => fn( $state ) => in_array( $state, [ 'delivered', 'shipped' ] ),
-                                  ] ),
-        Tables\Columns\TextColumn::make( 'currency' )
-                                 ->getStateUsing( fn( $record
-                                 ) : ?string => Currency::find( $record->currency )?->name ?? null )
-                                 ->searchable()
-                                 ->sortable(),
-        Tables\Columns\TextColumn::make( 'total_price' )
-                                 ->searchable()
-                                 ->sortable(),
-        Tables\Columns\TextColumn::make( 'shipping_price' )
-                                 ->label( 'Shipping cost' )
-                                 ->searchable()
-                                 ->sortable(),
+        TextColumn::make( 'created_at' )
+                  ->label( 'Order Date' )
+                  ->date()
+                  ->sortable(),
+        TextColumn::make( 'number' )
+                  ->searchable()
+                  ->sortable(),
+        TextColumn::make( 'customer.name' )
+                  ->searchable()
+                  ->sortable(),
+        BadgeColumn::make( 'status' )
+                   ->colors( [
+                     'danger'  => 'cancelled',
+                     'warning' => 'processing',
+                     'success' => fn( $state ) => in_array( $state, [ 'delivered', 'shipped' ] ),
+                   ] ),
+        TextColumn::make( 'currency' )
+                  ->getStateUsing( fn( $record
+                  ) : ?string => Currency::find( $record->currency )?->name ?? null )
+                  ->searchable()
+                  ->sortable(),
+        TextColumn::make( 'total_price' )
+                  ->searchable()
+                  ->sortable(),
+        TextColumn::make( 'shipping_price' )
+                  ->label( 'Shipping cost' )
+                  ->searchable()
+                  ->sortable(),
       ] )
       ->actions( [
-        Tables\Actions\Action::make( 'open' )
-                             ->url( fn( Order $record ) : string => OrderResource::getUrl( 'edit',
-                               [ 'record' => $record ] ) ),
+        Action::make( 'open' )
+              ->url( fn( Order $record ) : string => OrderResource::getUrl( 'edit',
+                [ 'record' => $record ] ) ),
       ] );
   }
 }

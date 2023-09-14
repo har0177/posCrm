@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RoleResource\Pages;
+use App\Filament\Resources\RoleResource\Pages\CreateRole;
+use App\Filament\Resources\RoleResource\Pages\EditRole;
+use App\Filament\Resources\RoleResource\Pages\ListRoles;
 use App\Models\Role;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -10,7 +12,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class RoleResource extends Resource
@@ -19,15 +26,14 @@ class RoleResource extends Resource
   
   protected static ?string $navigationIcon  = 'heroicon-o-cog';
   protected static ?string $navigationGroup = 'Roles & Users';
-
   
   public static function form( Form $form ) : Form
   {
     return $form
       ->schema( [
-        Section::make('Role')
-               ->description('Create / Update Role.')
-               ->icon('heroicon-m-cog')
+        Section::make( 'Role' )
+               ->description( 'Create / Update Role.' )
+               ->icon( 'heroicon-m-cog' )
                ->schema( [
                  Grid::make()
                      ->schema( [
@@ -59,31 +65,31 @@ class RoleResource extends Resource
   {
     return $table
       ->columns( [
-        Tables\Columns\TextColumn::make( 'name' )
-                                 ->searchable(),
-        Tables\Columns\TextColumn::make( 'permissions' ),
-        Tables\Columns\TextColumn::make( 'created_at' )
-                                 ->dateTime()
-                                 ->sortable()
-                                 ->toggleable( isToggledHiddenByDefault: true ),
-        Tables\Columns\TextColumn::make( 'updated_at' )
-                                 ->dateTime()
-                                 ->sortable()
-                                 ->toggleable( isToggledHiddenByDefault: true ),
+        TextColumn::make( 'name' )
+                  ->searchable(),
+        TextColumn::make( 'permissions' ),
+        TextColumn::make( 'created_at' )
+                  ->dateTime()
+                  ->sortable()
+                  ->toggleable( isToggledHiddenByDefault: true ),
+        TextColumn::make( 'updated_at' )
+                  ->dateTime()
+                  ->sortable()
+                  ->toggleable( isToggledHiddenByDefault: true ),
       ] )
       ->filters( [
       ] )
       ->actions( [
-        Tables\Actions\EditAction::make(),
-        Tables\Actions\DeleteAction::make(),
+        EditAction::make(),
+        DeleteAction::make(),
       ] )
       ->bulkActions( [
-        Tables\Actions\BulkActionGroup::make( [
-          Tables\Actions\DeleteBulkAction::make(),
+        BulkActionGroup::make( [
+          DeleteBulkAction::make(),
         ] ),
       ] )
       ->emptyStateActions( [
-        Tables\Actions\CreateAction::make(),
+        CreateAction::make(),
       ] );
   }
   
@@ -97,9 +103,9 @@ class RoleResource extends Resource
   public static function getPages() : array
   {
     return [
-      'index'  => Pages\ListRoles::route( '/' ),
-      'create' => Pages\CreateRole::route( '/create' ),
-      'edit'   => Pages\EditRole::route( '/{record}/edit' ),
+      'index'  => ListRoles::route( '/' ),
+      'create' => CreateRole::route( '/create' ),
+      'edit'   => EditRole::route( '/{record}/edit' ),
     ];
   }
 }

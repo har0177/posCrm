@@ -13,6 +13,12 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class UserResource extends Resource
@@ -26,9 +32,9 @@ class UserResource extends Resource
   {
     return $form
       ->schema( [
-        Section::make('User')
-          ->description('Create / Update User.')
-          ->icon('heroicon-m-user')
+        Section::make( 'User' )
+               ->description( 'Create / Update User.' )
+               ->icon( 'heroicon-m-user' )
                ->schema( [
                  Grid::make()
                      ->schema( [
@@ -60,38 +66,38 @@ class UserResource extends Resource
   {
     return $table
       ->columns( [
-        Tables\Columns\TextColumn::make( 'name' )
-                                 ->searchable(),
-        Tables\Columns\TextColumn::make( 'email' )
-                                 ->searchable(),
+        TextColumn::make( 'name' )
+                  ->searchable(),
+        TextColumn::make( 'email' )
+                  ->searchable(),
         Tables\Columns\IconColumn::make( 'status' )
                                  ->boolean(),
-        Tables\Columns\TextColumn::make( 'role.name' )
-                                 ->numeric()->searchable()
-                                 ->sortable(),
-        Tables\Columns\TextColumn::make( 'created_at' )
-                                 ->dateTime()
-                                 ->sortable()
-                                 ->toggleable( isToggledHiddenByDefault: true ),
-        Tables\Columns\TextColumn::make( 'updated_at' )
-                                 ->dateTime()
-                                 ->sortable()
-                                 ->toggleable( isToggledHiddenByDefault: true ),
+        TextColumn::make( 'role.name' )
+                  ->numeric()->searchable()
+                  ->sortable(),
+        TextColumn::make( 'created_at' )
+                  ->dateTime()
+                  ->sortable()
+                  ->toggleable( isToggledHiddenByDefault: true ),
+        TextColumn::make( 'updated_at' )
+                  ->dateTime()
+                  ->sortable()
+                  ->toggleable( isToggledHiddenByDefault: true ),
       ] )
       ->filters( [
         //
       ] )
       ->actions( [
-        Tables\Actions\EditAction::make(),
-        Tables\Actions\DeleteAction::make(),
+        EditAction::make(),
+        DeleteAction::make(),
       ] )
       ->bulkActions( [
-        Tables\Actions\BulkActionGroup::make( [
-          Tables\Actions\DeleteBulkAction::make(),
+        BulkActionGroup::make( [
+          DeleteBulkAction::make(),
         ] ),
       ] )
       ->emptyStateActions( [
-        Tables\Actions\CreateAction::make(),
+        CreateAction::make(),
       ] );
   }
   

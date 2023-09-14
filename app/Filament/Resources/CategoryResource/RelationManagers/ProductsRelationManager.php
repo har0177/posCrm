@@ -5,7 +5,9 @@ namespace App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Filament\Resources\ProductResource;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
 
 class ProductsRelationManager extends RelationManager
@@ -23,13 +25,13 @@ class ProductsRelationManager extends RelationManager
   {
     return ProductResource::table( $table )
                           ->headerActions( [
-                            Tables\Actions\CreateAction::make(),
+                            CreateAction::make(),
                           ] )
                           ->actions( [
-                            Tables\Actions\DeleteAction::make(),
+                            DeleteAction::make(),
                           ] )
                           ->groupedBulkActions( [
-                            Tables\Actions\DeleteBulkAction::make(),
+                            DeleteBulkAction::make(),
                           ] );
   }
 }

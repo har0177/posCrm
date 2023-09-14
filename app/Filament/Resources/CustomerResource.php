@@ -3,13 +3,19 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
-use App\Filament\Resources\CustomerResource\RelationManagers;
+use App\Filament\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
+use App\Filament\Resources\CustomerResource\RelationManagers\PaymentsRelationManager;
 use App\Models\Customer;
-use Filament\Forms;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -33,38 +39,38 @@ class CustomerResource extends Resource
   {
     return $form
       ->schema( [
-        Forms\Components\Section::make()
-                                ->schema( [
-                                  Forms\Components\TextInput::make( 'name' )
-                                                            ->maxValue( 50 )
-                                                            ->required(),
+        Section::make()
+               ->schema( [
+                 TextInput::make( 'name' )
+                          ->maxValue( 50 )
+                          ->required(),
           
-                                  Forms\Components\TextInput::make( 'email' )
-                                                            ->label( 'Email address' )
-                                                            ->required()
-                                                            ->email()
-                                                            ->unique( ignoreRecord: true ),
+                 TextInput::make( 'email' )
+                          ->label( 'Email address' )
+                          ->required()
+                          ->email()
+                          ->unique( ignoreRecord: true ),
           
-                                  Forms\Components\TextInput::make( 'phone' )
-                                                            ->maxValue( 50 )
-                                ] )
-                                ->columns( 2 )
-                                ->columnSpan( [ 'lg' => fn( ?Customer $record ) => $record === null ? 3 : 2 ] ),
+                 TextInput::make( 'phone' )
+                          ->maxValue( 50 )
+               ] )
+               ->columns( 2 )
+               ->columnSpan( [ 'lg' => fn( ?Customer $record ) => $record === null ? 3 : 2 ] ),
         
-        Forms\Components\Section::make()
-                                ->schema( [
-                                  Forms\Components\Placeholder::make( 'created_at' )
-                                                              ->label( 'Created at' )
-                                                              ->content( fn( Customer $record
-                                                              ) : ?string => $record->created_at?->diffForHumans() ),
+        Section::make()
+               ->schema( [
+                 Placeholder::make( 'created_at' )
+                            ->label( 'Created at' )
+                            ->content( fn( Customer $record
+                            ) : ?string => $record->created_at?->diffForHumans() ),
           
-                                  Forms\Components\Placeholder::make( 'updated_at' )
-                                                              ->label( 'Last modified at' )
-                                                              ->content( fn( Customer $record
-                                                              ) : ?string => $record->updated_at?->diffForHumans() ),
-                                ] )
-                                ->columnSpan( [ 'lg' => 1 ] )
-                                ->hidden( fn( ?Customer $record ) => $record === null ),
+                 Placeholder::make( 'updated_at' )
+                            ->label( 'Last modified at' )
+                            ->content( fn( Customer $record
+                            ) : ?string => $record->updated_at?->diffForHumans() ),
+               ] )
+               ->columnSpan( [ 'lg' => 1 ] )
+               ->hidden( fn( ?Customer $record ) => $record === null ),
       ] )
       ->columns( 3 );
   }
@@ -73,34 +79,34 @@ class CustomerResource extends Resource
   {
     return $table
       ->columns( [
-        Tables\Columns\TextColumn::make( 'name' )
-                                 ->searchable( isIndividual: true )
-                                 ->sortable(),
-        Tables\Columns\TextColumn::make( 'email' )
-                                 ->label( 'Email address' )
-                                 ->searchable( isIndividual: true, isGlobal: false )
-                                 ->sortable(),
-        Tables\Columns\TextColumn::make( 'country' )
-                                 ->getStateUsing( fn( $record
-                                 ) : ?string => Country::find( $record->addresses->first()?->country )?->name ?? null ),
-        Tables\Columns\TextColumn::make( 'phone' )
-                                 ->searchable()
-                                 ->sortable(),
+        TextColumn::make( 'name' )
+                  ->searchable( isIndividual: true )
+                  ->sortable(),
+        TextColumn::make( 'email' )
+                  ->label( 'Email address' )
+                  ->searchable( isIndividual: true, isGlobal: false )
+                  ->sortable(),
+        TextColumn::make( 'country' )
+                  ->getStateUsing( fn( $record
+                  ) : ?string => Country::find( $record->addresses->first()?->country )?->name ?? null ),
+        TextColumn::make( 'phone' )
+                  ->searchable()
+                  ->sortable(),
       ] )
       ->filters( [
-        Tables\Filters\TrashedFilter::make(),
+        TrashedFilter::make(),
       ] )
       ->actions( [
-        Tables\Actions\EditAction::make(),
+        EditAction::make(),
       ] )
       ->groupedBulkActions( [
-        Tables\Actions\DeleteBulkAction::make()
-                                       ->action( function() {
-                                         Notification::make()
-                                                     ->title( 'Now, now, don\'t be cheeky, leave some records for others to play with!' )
-                                                     ->warning()
-                                                     ->send();
-                                       } ),
+        DeleteBulkAction::make()
+                        ->action( function() {
+                          Notification::make()
+                                      ->title( 'Now, now, don\'t be cheeky, leave some records for others to play with!' )
+                                      ->warning()
+                                      ->send();
+                        } ),
       ] );
   }
   
@@ -112,8 +118,8 @@ class CustomerResource extends Resource
   public static function getRelations() : array
   {
     return [
-      RelationManagers\AddressesRelationManager::class,
-      RelationManagers\PaymentsRelationManager::class,
+      AddressesRelationManager::class,
+      PaymentsRelationManager::class,
     ];
   }
   
