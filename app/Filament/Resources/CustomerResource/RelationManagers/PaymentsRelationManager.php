@@ -51,7 +51,7 @@ class PaymentsRelationManager extends RelationManager
               ->options( collect( Currency::getCurrencies() )->mapWithKeys( fn(
                 $item,
                 $key
-              ) => [ $key => data_get( $item, 'name' ) ] ) )
+              ) => [ $key => data_get( $item, 'name' ) ] )->filter() )
               ->searchable()
               ->required(),
         
