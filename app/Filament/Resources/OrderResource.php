@@ -2,6 +2,7 @@
 		
 		namespace App\Filament\Resources;
 		
+		use App\Enums\OrderStatus;
 		use App\Filament\Resources\OrderResource\Pages;
 		use App\Filament\Resources\OrderResource\RelationManagers;
 		use App\Filament\Resources\OrderResource\Widgets\OrderStats;
@@ -54,6 +55,9 @@
 												                        Forms\Components\Placeholder::make( 'updated_at' )
 												                                                    ->label( 'Last modified at' )
 												                                                    ->content( fn( Order $record ) : ?string => $record->updated_at?->diffForHumans() ),
+												                        Forms\Components\Placeholder::make( 'total_price' )
+												                                                    ->label( 'Total Amount' )
+												                                                    ->content( fn( Order $record ) : ?string => Currency::find( $record->currency )?->symbol . ' ' . ( $record->total_price ?? 0 ) ),
 										                        ] )
 										                        ->columnSpan( [ 'lg' => 1 ] )
 										                        ->hidden( fn( ?Order $record ) => $record === null ),
@@ -67,7 +71,7 @@
 										Forms\Components\Repeater::make( 'items' )
 										                         ->relationship()
 										                         ->schema( [
-												                         Forms\Components\Select::make( 'shop_product_id' )
+												                         Forms\Components\Select::make( 'product_id' )
 												                                                ->label( 'Product' )
 												                                                ->options( Product::query()->pluck( 'name', 'id' ) )
 												                                                ->required()
@@ -113,7 +117,7 @@
 								                          ->disabled()
 								                          ->dehydrated()
 								                          ->required(),
-								Forms\Components\Select::make( 'shop_customer_id' )
+								Forms\Components\Select::make( 'customer_id' )
 								                       ->relationship( 'customer', 'name' )
 								                       ->searchable()
 								                       ->required()
@@ -142,13 +146,7 @@
 												                       ->modalWidth( 'lg' );
 								                       } ),
 								Forms\Components\Select::make( 'status' )
-								                       ->options( [
-										                       'new'        => 'New',
-										                       'processing' => 'Processing',
-										                       'shipped'    => 'Shipped',
-										                       'delivered'  => 'Delivered',
-										                       'cancelled'  => 'Cancelled',
-								                       ] )
+								                       ->options( OrderStatus::class )
 								                       ->required()
 								                       ->native( false ),
 								Forms\Components\Select::make( 'currency' )
@@ -174,12 +172,7 @@
 										                         ->searchable()
 										                         ->sortable()
 										                         ->toggleable(),
-										Tables\Columns\BadgeColumn::make( 'status' )
-										                          ->colors( [
-												                          'danger'  => 'cancelled',
-												                          'warning' => 'processing',
-												                          'success' => fn( $state ) => in_array( $state, [ 'delivered', 'shipped' ] ),
-										                          ] ),
+										Tables\Columns\BadgeColumn::make( 'status' )->badge(),
 										Tables\Columns\TextColumn::make( 'currency' )
 										                         ->getStateUsing( fn( $record ) : ?string => Currency::find( $record->currency )?->name ?? null )
 										                         ->searchable()
@@ -236,7 +229,7 @@
 												                     if( $data[ 'created_until' ] ?? null ) {
 														                     $indicators[ 'created_until' ] = 'Order until ' . Carbon::parse( $data[ 'created_until' ] )->toFormattedDateString();
 												                     }
-												
+												                     
 												                     return $indicators;
 										                     } ),
 								] )
@@ -302,5 +295,6 @@
 				{
 						return static::$model::where( 'status', 'new' )->count();
 				}
+				
 				
 		}

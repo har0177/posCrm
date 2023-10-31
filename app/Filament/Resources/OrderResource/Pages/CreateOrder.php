@@ -15,9 +15,17 @@
 				use HasWizard;
 				protected static string $resource = OrderResource::class;
 				
+				
 				protected function afterCreate() : void
 				{
 						$order = $this->record;
+						// Use the `map` function to calculate the total price based on related items
+						$totalPrice = $order->items->map( function( $item ) {
+								return $item->qty * $item->unit_price;
+						} )->sum();
+						// Update the `total_price` field in the Order model
+						$order->total_price = $totalPrice;
+						$order->save();
 						Notification::make()
 						            ->title( 'New order' )
 						            ->icon( 'heroicon-o-shopping-bag' )

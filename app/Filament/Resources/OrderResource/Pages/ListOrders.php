@@ -2,7 +2,10 @@
 		
 		namespace App\Filament\Resources\OrderResource\Pages;
 		
+		use App\Enums\OrderStatus;
 		use App\Filament\Resources\OrderResource;
+		use App\Models\Order;
+		use Filament\Actions\EditAction;
 		use Filament\Pages\Actions;
 		use Filament\Pages\Concerns\ExposesTableToWidgets;
 		use Filament\Resources\Pages\ListRecords;
@@ -13,19 +16,21 @@
 				protected static string $resource = OrderResource::class;
 				public function getTabs() : array
 				{
-						return [
-								null         => ListRecords\Tab::make( 'All' ),
-								'new'        => ListRecords\Tab::make()->query( fn( $query ) => $query->where( 'status', 'new' ) ),
-								'processing' => ListRecords\Tab::make()->query( fn( $query ) => $query->where( 'status', 'processing' ) ),
-								'shipped'    => ListRecords\Tab::make()->query( fn( $query ) => $query->where( 'status', 'shipped' ) ),
-								'delivered'  => ListRecords\Tab::make()->query( fn( $query ) => $query->where( 'status', 'delivered' ) ),
-								'cancelled'  => ListRecords\Tab::make()->query( fn( $query ) => $query->where( 'status', 'cancelled' ) ),
+						$tabs = [
+								null => ListRecords\Tab::make( 'All' ),
 						];
+						foreach( OrderStatus::cases() as $status ) {
+								$tabs[ $status->value ] = ListRecords\Tab::make()
+								                                         ->label( OrderStatus::from( $status->value )->getLabel() )
+								                                         ->query( fn( $query ) => $query->where( 'status', $status->value ) );
+						}
+						
+						return $tabs;
 				}
 				protected function getActions() : array
 				{
 						return [
-								Actions\CreateAction::make(),
+								Actions\CreateAction::make()
 						];
 				}
 				protected function getHeaderWidgets() : array
