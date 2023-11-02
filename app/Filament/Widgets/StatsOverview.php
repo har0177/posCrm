@@ -28,23 +28,26 @@
 						$previousMonthNewOrders = $this->getPreviousMonthNewOrders();
 						$newCustomersIncrease = $newCustomersData - $previousMonthNewCustomers;
 						$newOrdersIncrease = $newOrdersData - $previousMonthNewOrders;
+						$revenueGraph = $this->generateDescription( $revenueIncrease, $previousMonthRevenue );
+						$customerGraph = $this->generateDescription( $newCustomersIncrease, $previousMonthNewCustomers );
+						$orderGraph = $this->generateDescription( $newOrdersIncrease, $previousMonthNewOrders );
 						
 						return [
 								Stat::make( 'Revenue', '$' . number_format( $revenueData, 2 ) )
-								    ->description( $this->generateDescription( $revenueIncrease, $previousMonthRevenue ) )
+								    ->description( $revenueGraph )
 								    ->descriptionIcon( 'heroicon-m-arrow-trending-up' )
 								    ->chart( $this->getChartDataForRevenue() )
-								    ->color( 'success' ),
+								    ->color( $revenueGraph > 0 ? 'success' : 'danger' ),
 								Stat::make( 'New customers', $newCustomersData )
-								    ->description( $this->generateDescription( $newCustomersIncrease, $previousMonthNewCustomers ) )
+								    ->description( $customerGraph )
 								    ->descriptionIcon( 'heroicon-m-arrow-trending-up' )
 								    ->chart( $this->getChartDataForNewCustomers() )
-								    ->color( 'danger' ),
+								    ->color( $customerGraph > 0 ? 'success' : 'danger' ),
 								Stat::make( 'New orders', $newOrdersData )
-								    ->description( $this->generateDescription( $newOrdersIncrease, $previousMonthNewOrders ) )
+								    ->description( $orderGraph )
 								    ->descriptionIcon( 'heroicon-m-arrow-trending-up' )
 								    ->chart( $this->getChartDataForNewOrders() )
-								    ->color( 'success' ),
+								    ->color( $orderGraph > 0 ? 'success' : 'danger' ),
 						];
 				}
 				
@@ -52,16 +55,16 @@
 				protected function generateDescription( $increase, $previousValue )
 				{
 						if( $previousValue === 0 ) {
-								return 'N/A'; // Handle the case where the previous value is zero to avoid division by zero
+								return 0; // Handle the case where the previous value is zero to avoid division by zero
 						}
 						$percentageChange = ( ( $increase / $previousValue ) * 100 );
 						if( $increase > 0 ) {
 								return number_format( $percentageChange, 2 ) . '% increase';
-						} elseif( $increase < 0 ) {
-								return number_format( abs( $percentageChange ), 2 ) . '% decrease';
-						} else {
-								return 'No change';
 						}
+						if( $increase < 0 ) {
+								return number_format( abs( $percentageChange ), 2 ) . '% decrease';
+						}
+						return 'No change';
 				}
 				
 				
