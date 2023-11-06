@@ -120,6 +120,7 @@
 								Forms\Components\Select::make( 'customer_id' )
 								                       ->relationship( 'customer', 'name' )
 								                       ->searchable()
+								                       ->preload()
 								                       ->required()
 								                       ->createOptionForm( [
 										                       Forms\Components\TextInput::make( 'name' )

@@ -14,6 +14,12 @@
 				
 				protected static string $resource = OrderResource::class;
 				
+				
+				protected function getRedirectUrl() : string
+				{
+						return $this->getResource()::getUrl( 'index' );
+				}
+				
 				protected function afterSave() : void
 				{
 						$order = $this->record;
