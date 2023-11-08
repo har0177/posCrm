@@ -45,4 +45,9 @@
 				}
 				
 				
+				public static function canView(): bool
+				{
+						return auth()->user()->can('view order');
+				}
+				
 		}

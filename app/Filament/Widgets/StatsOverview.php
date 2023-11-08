@@ -64,6 +64,7 @@
 						if( $increase < 0 ) {
 								return number_format( abs( $percentageChange ), 2 ) . '% decrease';
 						}
+						
 						return 'No change';
 				}
 				
