@@ -17,6 +17,8 @@
     "filament/spatie-laravel-translatable-plugin": "^3.0",
     "flowframe/laravel-trend": "^0.1.5",
     "guzzlehttp/guzzle": "^7.2",
+    "hasnayeen/themes": "^3.0",
+    "icetalker/filament-chatgpt-bot": "^1.0",
     "laravel/framework": "^10.10",
     "laravel/sanctum": "^3.2",
     "laravel/tinker": "^2.8",
