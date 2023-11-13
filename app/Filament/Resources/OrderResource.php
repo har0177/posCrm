@@ -236,6 +236,7 @@
 								] )
 								->actions( [
 										Tables\Actions\EditAction::make(),
+										Tables\Actions\ViewAction::make(),
 								] )
 								->groupedBulkActions( [
 										Tables\Actions\DeleteBulkAction::make()
@@ -270,6 +271,7 @@
 						return [
 								'index'  => Pages\ListOrders::route( '/' ),
 								'create' => Pages\CreateOrder::route( '/create' ),
+								'view'   => Pages\ViewOrder::route( '/{record}' ),
 								'edit'   => Pages\EditOrder::route( '/{record}/edit' ),
 						];
 				}
@@ -296,6 +298,7 @@
 				{
 						return static::$model::where( 'status', 'new' )->count();
 				}
+				
 				
 				
 		}
