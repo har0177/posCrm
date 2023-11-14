@@ -30,6 +30,15 @@
 						// Update the `total_price` field in the Order model
 						$order->total_price = $totalPrice;
 						$order->save();
+						Notification::make()
+						            ->title( 'Update order' )
+						            ->icon( 'heroicon-o-shopping-bag' )
+						            ->body( "**{$order->customer->name} updated ordered {$order->items->count()} products.**" )
+						            ->actions( [
+								            Action::make( 'View' )
+								                  ->url( OrderResource::getUrl( 'view', [ 'record' => $order ] ) ),
+						            ] )
+						            ->sendToDatabase( auth()->user() );
 				}
 				
 				

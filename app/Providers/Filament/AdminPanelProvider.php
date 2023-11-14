@@ -2,9 +2,11 @@
 		
 		namespace App\Providers\Filament;
 		
+		use App\Filament\Pages\EditProfile;
 		use Filament\Http\Middleware\Authenticate;
 		use Filament\Http\Middleware\DisableBladeIconComponents;
 		use Filament\Http\Middleware\DispatchServingFilamentEvent;
+		use Filament\Navigation\MenuItem;
 		use Filament\Pages;
 		use Filament\Panel;
 		use Filament\PanelProvider;
@@ -31,6 +33,7 @@
 								->id( 'admin' )
 								->path( 'admin' )
 								->login()
+								->profile()
 								->colors( [
 										'danger'  => Color::Rose,
 										'gray'    => Color::Gray,
@@ -50,6 +53,7 @@
 										/*  Widgets\AccountWidget::class,
 												Widgets\FilamentInfoWidget::class,*/
 								] )
+								->databaseNotifications()
 								->plugins(
 										[
 												Lockscreen::make(),

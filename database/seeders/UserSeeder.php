@@ -23,7 +23,7 @@
 								'email'    => 'admin@admin.com',
 								'password' => Hash::make( 'admin' ),
 								'status'   => 1,
-								'role_id'     => Role::find( 1 )->id,
+								'role_id'  => Role::find( 1 )->id,
 						] );
 				}
 				

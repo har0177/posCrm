@@ -2,6 +2,8 @@
 		
 		namespace App\Filament\Resources;
 		
+		use App\Enums\OrderStatus;
+		use App\Enums\ProductType;
 		use App\Filament\Resources\BrandResource\RelationManagers\ProductsRelationManager;
 		use App\Filament\Resources\ProductResource\Pages;
 		use App\Filament\Resources\ProductResource\RelationManagers\CommentsRelationManager;
@@ -22,6 +24,7 @@
 		use Filament\Resources\Resource;
 		use Filament\Tables\Actions\DeleteBulkAction;
 		use Filament\Tables\Actions\EditAction;
+		use Filament\Tables\Columns\BadgeColumn;
 		use Filament\Tables\Columns\IconColumn;
 		use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 		use Filament\Tables\Columns\TextColumn;
@@ -153,6 +156,10 @@
 														                      ->label( 'Availability' )
 														                      ->default( now() )
 														                      ->required(),
+														            Forms\Components\Select::make( 'type' )
+														                                   ->options( ProductType::class )
+														                                   ->required()
+														                                   ->native( false ),
 												            ] ),
 												     Section::make( 'Associations' )
 												            ->schema( [
@@ -188,6 +195,7 @@
 										          ->searchable()
 										          ->sortable()
 										          ->toggleable(),
+										BadgeColumn::make( 'type' )->badge() ,
 										IconColumn::make( 'is_visible' )
 										          ->label( 'Visibility' )
 										          ->boolean()

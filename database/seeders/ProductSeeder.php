@@ -2,6 +2,7 @@
 		
 		namespace Database\Seeders;
 		
+		use App\Enums\ProductType;
 		use App\Models\Brand;
 		use App\Models\Category;
 		use App\Models\Product;
@@ -30,11 +31,9 @@
 								'old_price'         => 2500,
 								'price'             => 3500,
 								'cost'              => 2700,
-								'type'              => '',
+								'type'              => ProductType::Deliverable,
 								'backorder'         => 1,
 								'requires_shipping' => 1,
-								'seo_title'         => 'SNEAKER SS-2151',
-								'seo_description'   => 'Minimalist and casual sneakers with ultimate cushioning, memory effect insole for grip and attractive insole lining that enhance your style.',
 						] );
 						$category = Category::find( 1 );
 						if( $category ) {

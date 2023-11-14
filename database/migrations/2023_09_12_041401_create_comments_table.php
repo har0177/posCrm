@@ -13,7 +13,7 @@ return new class extends Migration {
   {
     Schema::create( 'comments', function( Blueprint $table ) {
       $table->id();
-      $table->foreignIdFor( Customer::class )->nullable()->constrained( 'customers' )->cascadeOnDelete();
+      $table->foreignIdFor( Customer::class )->constrained( 'customers' )->cascadeOnDelete();
       $table->morphs( 'commentable' );
       $table->text( 'title' )->nullable();
       $table->text( 'content' )->nullable();

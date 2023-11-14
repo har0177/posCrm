@@ -2,6 +2,7 @@
 		
 		namespace Database\Seeders;
 		
+		use App\Enums\OrderStatus;
 		use App\Models\Address;
 		use App\Models\Customer;
 		use App\Models\Order;
@@ -20,7 +21,7 @@
 								'number'      => 'OR-953734',
 								'customer_id' => Customer::find( 1 )->id,
 								'total_price' => Product::find( 1 )->price,
-								'status'      => 'new',
+								'status'      => OrderStatus::New,
 								'currency'    => 'usd',
 								'notes'       => 'Testing Order',
 						] );

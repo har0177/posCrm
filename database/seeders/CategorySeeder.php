@@ -18,7 +18,6 @@
 								'name'        => 'Sneaker',
 								'slug'        => Str::slug( 'Sneaker' ),
 								'description' => "Urbansole’s journey started with the first step take '1998, when the company was formed as a national brand with an international outlook.",
-								'position'    => 0,
 								'is_visible'  => 1,
 						] );
 				}

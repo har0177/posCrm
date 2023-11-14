@@ -38,7 +38,7 @@
 						            ->body( "**{$order->customer->name} ordered {$order->items->count()} products.**" )
 						            ->actions( [
 								            Action::make( 'View' )
-								                  ->url( OrderResource::getUrl( 'edit', [ 'record' => $order ] ) ),
+								                  ->url( OrderResource::getUrl( 'view', [ 'record' => $order ] ) ),
 						            ] )
 						            ->sendToDatabase( auth()->user() );
 				}
